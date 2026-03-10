@@ -3,13 +3,17 @@ import streamlit as st
 
 def get_groq_response(input_text):
     url = "http://localhost:8001/essay/invoke"
-    response = requests.post(url, json={'input' : {'topic': input_text}})
-    return response.json()['output']['content']
+    response = requests.post(url, json={'input' : {'topic': input_text, 'word_count': '100'}})
+    data = response.json()
+    out = data.get('output', data)
+    return (out.get('content') if isinstance(out, dict) else out) or str(data)
 
 def get_ollama_response(input_text):
     url = "http://localhost:8001/poem/invoke"
-    response = requests.post(url, json={'input' : {'topic': input_text}})
-    return response.json()["response"]
+    response = requests.post(url, json={'input' : {'topic': input_text, 'word_count': '50'}})
+    data = response.json()
+    out = data.get('output', data.get('response', data))
+    return (out.get('content') if isinstance(out, dict) else out) or str(data)
 
 st.title("LangChain API Client")
 
